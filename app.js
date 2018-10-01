@@ -4,8 +4,29 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
+// FIXME Add mongodb connection
+const MongoClient = require('mongodb').MongoClient;
+
+// Connection URL
+const url = 'mongodb://localhost:27017';
+
+// Database Name
+const dbName = 'myproject';
+
+// Use connect method to connect to the server
+MongoClient.connect(url, function(err, client) {
+    console.log("Connected successfully to server");
+
+    const db = client.db(dbName);
+
+    // Set Instance DB in App instance
+    // Map, Set, WeakMap, WeakSet,    { key : value }
+    app.set('mongodb', db);
+});
+
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const offersRouter = require('./routes/offers');
 
 var app = express();
 
@@ -14,13 +35,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
+// parse from request json objects
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/offers', offersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
